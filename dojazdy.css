@@ -1,0 +1,214 @@
+body
+{
+	font-size: 12px;
+	font-weight: bold;
+	font-family:Arial, Tahoma, Helvetica, sans-serif;		
+}
+.main
+{
+	background-color: #CFA0E7;
+	position: relative;
+	border: 1px solid black;
+	margin: 0px auto;
+	padding: 0px;
+	width: 960px;
+	height:700px;
+	vertical-align: top;
+	font-family:Arial, Tahoma, Helvetica, sans-serif;
+}
+
+.menu_g
+{
+	position: absolute;   
+	top: 0px;
+	left: 0px;
+	background-color: #9B66B5;
+	border: none;
+	margin: 0px;
+	padding: 0px;
+	width: 100%;
+	height: 10%;
+	font-family:Arial, Tahoma, Helvetica, sans-serif;
+}
+.opona
+{
+	position: absolute; 
+	width: 70px;
+	height: 68px;
+	left: 15px;
+	top: 2px;
+}
+.tytul
+{
+	color: purple;
+	font-size: 18px;
+	font-family:Arial, Tahoma, Helvetica, sans-serif;
+	text-align: center;
+}
+.menu_l
+{
+	position: absolute;   
+	top: 10%;
+	left: 0px;
+	background-color: #9B66B5;
+	border: none;
+	margin: 0px;
+	padding: 0px;
+	width: 10%;
+	height: 90%;
+	font-family:Arial, Tahoma, Helvetica, sans-serif;
+}
+
+.menu_l_p
+{
+	margin: 10px;
+	margin-top: 15px;
+	padding: 0px;
+	font-size: 12px;
+	font-weight: bold;
+	font-family:Arial, Tahoma, Helvetica, sans-serif;
+	color: black;
+	cursor: pointer;
+	width: 80%;
+	height: 40px;
+
+}
+
+.menu_r
+{
+	position: absolute;   
+	top: 10%;
+	right: 0px;
+	background-color: #CFA0E7;
+	border: none;
+	margin: 0px;
+	padding: 0px;
+	width: 10%;
+	height: 90%;
+	font-family:Arial, Tahoma, Helvetica, sans-serif;
+}
+
+.obszar_r
+{
+	position: absolute;   
+	top: 10%;
+	right: 10%;
+	left: 10%;
+	background-color: #CFA0E7;
+	border: none;
+	margin: 0px;
+	padding: 0px;
+	width: 80%;
+	height: 90%;
+	font-family:Arial, Tahoma, Helvetica, sans-serif;
+	text-align: center;
+}
+
+.obszar_belka
+{
+	position: absolute;   
+	background-color: #CFA0E7;
+	border: none;
+	top: 0px;
+	margin: 0px;
+	padding: 0px;
+	width: 100%;
+	height: 15%;
+	font-family:Arial, Tahoma, Helvetica, sans-serif;
+	text-align: left;
+}
+.pozycja_belka
+{
+	background-color: #CFA0E7;
+	margin: 10px;
+	border: none;
+	padding: 0px;
+}
+.obszar_tabelka
+{
+	position: absolute;   
+	background-color: #CFA0E7;
+	border: none;
+	bottom: 0px;
+	margin: 0px;
+	padding: 0px;
+	width: 100%;
+	height: 85%;
+	font-family:Arial, Tahoma, Helvetica, sans-serif;
+	text-align: center;
+}
+.wiersz_rozliczenia
+{
+	cursor: pointer;
+}
+.tabelka
+{
+	border: 1px solid black;
+	margin: auto;
+}
+
+th
+{
+	font-size: 12px;
+	font-weight: bold;
+	font-family:Arial, Tahoma, Helvetica, sans-serif;	
+}
+
+td
+{
+	border: 1px solid black;
+	font-size: 12px;
+	font-family:Arial, Tahoma, Helvetica, sans-serif;
+	margin:auto;
+	text-align: center;
+}
+
+select
+{
+	cursor: pointer;
+	height: 20px;
+}
+input
+{
+	border: 1px solid silver;
+	padding: 2px;
+	font-size: 12px;
+	font-weight: bold;
+	font-family:Arial, Tahoma, Helvetica, sans-serif;
+	height: 20px;
+}
+
+.pin_zapisu
+{
+	border: 1px solid black;
+	background-color:orange;
+	width: 180px;
+	height: 22px;
+	font-size: 12px;
+	font-family:Arial, Tahoma, Helvetica, sans-serif;
+	margin:auto;
+	margin-top:10px;
+	padding:5px;
+	text-align: center;	
+}
+#zapisz_dojazdy
+{
+	cursor: pointer;
+	margin: auto;
+	margin-top: 10px;
+	width: 10%;
+	height: 40px;	
+	font-family:Arial, Tahoma, Helvetica, sans-serif;
+	font-weight: bold;	
+}
+
+#powrot
+{
+	cursor: pointer;
+	margin: auto;
+	margin-top: 10px;
+	width: 10%;
+	height: 40px;
+	font-family:Arial, Tahoma, Helvetica, sans-serif;
+	font-weight: bold;	
+}
