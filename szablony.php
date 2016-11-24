@@ -17,7 +17,7 @@ if (isset($_POST['tablica']))
 				for($i=0;$i<5;$i++)
 				{
 ?>
-					<OPTION VALUE="<?php echo date('Y/m/d',strtotime('-'.$i.' days'));?>"    	><?php echo date('Y/m/d l',strtotime('-'.$i.' days'));?>
+					<OPTION VALUE="<?php echo date('Y/m/d',strtotime('-'.$i.' days'));?>"    	><?php echo dniTygodniaPL(date('Y/m/d l',strtotime('-'.$i.' days')));?>
 <?php					
 				}
 ?>
@@ -162,7 +162,7 @@ if (isset($_POST['tablica']))
 				while ($row = $result->fetch_assoc())
 				{
 ?>
-					<OPTION VALUE="<?php echo $row['data'];?>"    	><?php echo $row['data'];?>
+					<OPTION VALUE="<?php echo $row['data'];?>"    	><?php echo dniTygodniaPL($row['data']);?>
 <?php
 
 				}
@@ -204,13 +204,13 @@ if (isset($_POST['tablica']))
 				$color_b=rand(150,255);
 ?>
 				<tr style="background-color:rgb(<?php echo $color_r.','.$color_g.','.$color_b; ?>)">
-				<td>
+				<td class="wiersz_rozliczenia">
 					<?php echo $row['kto_winny'];?>
 				</td>
-				<td>
+				<td class="wiersz_rozliczenia">
 					<?php echo $row['komu_winny'];?>
 				</td>
-				<td>
+				<td class="wiersz_rozliczenia" style="text-align: right;">
 					<?php echo $row['ile'];?>
 				</td>
 				</tr>
@@ -303,11 +303,11 @@ if (isset($_POST['tablica']))
 				<td class="wiersz_rozliczenia">
 					<?php echo $row['trasa'];?>
 				</td>
-				<td>
+				<td class="wiersz_rozliczenia" style="text-align: right;">
 					<?php echo $row['dystans'];?>
 				</td>
 				<td class="wiersz_rozliczenia">
-					<?php echo $row['data_przejazdu'].' '.date('l',strtotime($row['data_przejazdu']));?>
+					<?php echo $row['data_przejazdu'].' '.dniTygodniaPL(date('l',strtotime($row['data_przejazdu'])));?>
 				</td>					
 				</tr>
 <?php
@@ -339,5 +339,17 @@ function clearStoredResults(){
          }
         } while ($mysqli->more_results() && $mysqli->next_result());        
 
+}
+
+function dniTygodniaPL($wejscie)
+{
+	$wejscie=preg_replace('/Monday/','Poniedziałek',$wejscie);
+	$wejscie=preg_replace('/Tuesday/','Wtorek',$wejscie);
+	$wejscie=preg_replace('/Wednesday/','Środa',$wejscie);
+	$wejscie=preg_replace('/Thursday/','Czwartek',$wejscie);
+	$wejscie=preg_replace('/Friday/','Piątek',$wejscie);
+	$wejscie=preg_replace('/Saturday/','Sobota',$wejscie);
+	$wejscie=preg_replace('/Sunday/','Niedziela',$wejscie);
+	return $wejscie;
 }
 ?>
