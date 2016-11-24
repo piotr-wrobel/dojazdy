@@ -1,6 +1,6 @@
 <?php
 
-if(!defined('VERSION')) define('VERSION','1.0.1');
+if(!defined('VERSION')) define('VERSION','1.0.2');
 
 //Configuracja bazy danych
 $database['host']		= 'localhost';
