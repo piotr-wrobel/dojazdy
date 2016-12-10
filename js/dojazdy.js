@@ -1,4 +1,22 @@
 function $g(element){return document.getElementById(element);}
+function procesujStatus(tresc)
+{
+	var otwierajacy='<status>';
+	var zamykajacy='</status>';
+	var zamkniecie=tresc.lastIndexOf(zamykajacy);
+	if(zamkniecie<0)
+		return {status:'wyloguj',html:''}; // Nie było węzła </status> - na drzewo
+	
+	var html=zamkniecie+zamykajacy.length; // Mamy indeks następujące po weźle status znaku, to już treść html
+	html=tresc.slice(html); // Wyłuskujemy tresc html
+	var status=tresc.slice(0,zamkniecie); // Przed wezlem </status> mamy zawartosc statusu, ale z tagiem <status>
+	var otwarcie=status.indexOf(otwierajacy); //Szukamy <status>
+	if(otwarcie<0)
+		return {status:'wyloguj',html:''}; // Nie bylo węzła <status> - na drzewo
+	
+	status=status.slice(otwarcie+otwierajacy.length); //Wyluskujemy czysty status
+	return {status:status,html:html};
+}
 
 function pokazPrzejazdy(krok,data)
 {
@@ -20,24 +38,25 @@ function pokazPrzejazdy(krok,data)
 			"tablica" : JSON.stringify(DW)
 		},
 		beforeSend : function(xhrObj,status) {
-			//waitOn();
 		},
 		success : function(wyjscie,status,xhrObj) {
+			wyjscie=procesujStatus(wyjscie);
 			switch(krok)
 			{
 				case 1:
-					$g('obszar_r').innerHTML=wyjscie;
+					$g('obszar_r').innerHTML=wyjscie.html;
 				break;
 				case 2:
-					$g('obszar_tabelka').innerHTML=wyjscie;
+					$g('obszar_tabelka').innerHTML=wyjscie.html;
 				break;
 			}
-			
+			if(wyjscie.status!='ok')
+			{
+				wyloguj(true);
+			}
 		},
 		error : function(xhrObj,status,wyjatek) { 
-			//waitOff();
 			alert("Błąd komunikacji z serwerem: "+status+' ('+wyjatek +')');
-			//****
 		}    
 	});	
 }
@@ -63,24 +82,25 @@ function biezaceRozliczenie(krok,data,powrot)
 			"tablica" : JSON.stringify(DW)
 		},
 		beforeSend : function(xhrObj,status) {
-			//waitOn();
 		},
 		success : function(wyjscie,status,xhrObj) {
+			wyjscie=procesujStatus(wyjscie);
 			switch(krok)
 			{
 				case 1:
-					$g('obszar_r').innerHTML=wyjscie;
+					$g('obszar_r').innerHTML=wyjscie.html;
 				break;
 				case 2:
-					$g('obszar_tabelka').innerHTML=wyjscie;
+					$g('obszar_tabelka').innerHTML=wyjscie.html;
 				break;
+			}				
+			if(wyjscie.status!='ok')
+			{
+				wyloguj(true);
 			}
-			
 		},
 		error : function(xhrObj,status,wyjatek) { 
-			//waitOff();
 			alert("Błąd komunikacji z serwerem: "+status+' ('+wyjatek +')');
-			//****
 		}    
 	});
 }
@@ -104,29 +124,30 @@ function dodajDojazdy(krok,pasazerow)
 				"tablica" : JSON.stringify(DW)
 			},
 			beforeSend : function(xhrObj,status) {
-				//waitOn();
 			},
 			success : function(wyjscie,status,xhrObj) {
+				wyjscie=procesujStatus(wyjscie);
 				switch(krok)
 				{
 					case 1:
-						$g('obszar_r').innerHTML=wyjscie;
+						$g('obszar_r').innerHTML=wyjscie.html;
 					break;
 					case 2:
 						if(wierszy==0)
-							$g('obszar_tabelka').innerHTML=wyjscie;
+							$g('obszar_tabelka').innerHTML=wyjscie.html;
 						else
 						{	
-							$("table").append(wyjscie);
+							$("table").append(wyjscie.html);
 						}
 					break;
+				}				
+				if(wyjscie.status!='ok')
+				{
+					wyloguj(true);
 				}
-				
 			},
 			error : function(xhrObj,status,wyjatek) { 
-				//waitOff();
 				alert("Błąd komunikacji z serwerem: "+status+' ('+wyjatek +')');
-				//****
 			}    
 		});
 	} else
@@ -196,7 +217,6 @@ function zapiszDojazdy()
 	DW.dane=zebrane;
 	DW.sesja='abcde';
 	DW.pin=$g("pin").value;
-	//alert(JSON.stringify(DW));
 	$.ajax({ 
 		url: "odbiornik.php",
 		async: true,
@@ -206,11 +226,9 @@ function zapiszDojazdy()
 			"tablica" : JSON.stringify(DW)
 		},
 		beforeSend : function(xhrObj,status) {
-			//waitOn();
 		},
 		success : function(wyjscie,status,xhrObj) {
 			SP=JSON.parse(wyjscie);
-			//waitOff();
 			if (SP.zezwolenie)
 			{
 				alert('Rekordy zapisane');
@@ -219,17 +237,76 @@ function zapiszDojazdy()
 			} else
 			{
 				alert(SP.komunikat);
-				//***
 			}
 		},
 		error : function(xhrObj,status,wyjatek) { 
-			//waitOff();
 			alert("Błąd komunikacji z serwerem: "+status+' ('+wyjatek +')');
-			//****
 		}    
 	}); 		
 }
 
+function wyloguj(komunikat)
+{
+	var ciasteczka = document.cookie;
+	if(ciasteczka.indexOf('doJazdy_c1')>-1)
+	{	
+		if(typeof komunikat!='undefined' && komunikat==true)
+			alert('Twoja sesja wygasła, zaloguj się ponownie !');
+		setCookie('doJazdy_c1', '', -1);
+		location.reload(true);
+	}
+}
+
+
+function setCookie(cname, cvalue, exdays) {
+    if(exdays>=0)
+	{
+		var d = new Date();
+		d.setTime(d.getTime() + (exdays*24*60*60*1000));
+		var expires = "expires="+ d.toUTCString();
+    }else
+	{
+		var expires = "expires=Thu, 01 Jan 1970 00:00:00 UTC";
+		cvalue='';
+	}
+	document.cookie = cname + "=" + cvalue + ";" + expires + ";path="+location.pathname+";secure=true;";
+}
+
+function zaloguj(password)
+{
+
+	var SP=new Object();
+	var DW=new Object();
+	DW.zdarzenie='zaloguj';
+	DW.haslo=password;
+	$.ajax({ 
+		url: "odbiornik.php",
+		async: true,
+		method: 'POST',
+		timeout: 10000,
+		data : {
+			"tablica" : JSON.stringify(DW)
+		},
+		beforeSend : function(xhrObj,status) {
+		},
+		success : function(wyjscie,status,xhrObj) {
+			SP=JSON.parse(wyjscie);
+			if (SP.zezwolenie)
+			{
+				setCookie('doJazdy_c1', SP.sesja, 7);
+				location.reload(true);
+				
+			} else
+			{
+				alert(SP.komunikat);
+			}
+		},
+		error : function(xhrObj,status,wyjatek) { 
+			alert("Błąd komunikacji z serwerem: "+status+' ('+wyjatek +')');
+		}    
+	}); 
+
+}
 
 function menu(pozycja)
 {
@@ -246,12 +323,19 @@ function menu(pozycja)
 		case 3:
 			dodajDojazdy(1);
 		break;
+		case 4:
+			password_prompt("Podaj kod dostępu:", "Zaloguj", function(password) {
+				if(password.length>3)
+					zaloguj(password);
+			});
+		break;
+		case 5:
+			wyloguj();
+		break;
 	}
 }
 
 function start()
 {
-
 	menu(1);
-	//dodajDojazdy(1);
 }

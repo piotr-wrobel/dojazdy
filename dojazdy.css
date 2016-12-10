@@ -139,6 +139,13 @@ body
 }
 .wiersz_rozliczenia
 {
+	cursor: default;
+	padding-left: 10px;
+	padding-right: 10px;
+	text-align: left;
+}
+.wiersz_przejazdow
+{
 	cursor: pointer;
 	padding-left: 10px;
 	padding-right: 10px;

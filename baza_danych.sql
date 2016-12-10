@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Czas generowania: 24 Lis 2016, 21:28
+-- Czas generowania: 10 Gru 2016, 22:35
 -- Wersja serwera: 10.0.28-MariaDB-0+deb8u1
 -- Wersja PHP: 5.6.27-0+deb8u1
 
@@ -40,6 +40,20 @@ INNER JOIN slownik_uczestnicy su2 ON zliczone.komu=su2.id
 ORDER BY ile DESC;
 END$$
 
+CREATE DEFINER=`phpmyadmin`@`localhost` PROCEDURE `zaloguj`(IN `haslo` VARCHAR(30) CHARSET utf8)
+    MODIFIES SQL DATA
+BEGIN
+DECLARE id INT DEFAULT 0;
+DECLARE hhaslo VARCHAR(50) DEFAULT '';
+SELECT su.id,su.haslo INTO id,hhaslo FROM slownik_uczestnicy su WHERE aktywny_do > NOW() AND aktywny_od < NOW() AND su.haslo=PASSWORD(haslo) LIMIT 1;
+IF id>0 THEN
+	SELECT PASSWORD(CONCAT(NOW(),hhaslo)) INTO hhaslo;
+    UPDATE slownik_uczestnicy su SET su.sesja=hhaslo,sesja_wazna=ADDDATE(NOW(),'7') WHERE su.id=id;
+END IF;
+
+SELECT hhaslo AS sesja;
+END$$
+
 DELIMITER ;
 
 -- --------------------------------------------------------
@@ -58,7 +72,7 @@ CREATE TABLE IF NOT EXISTS `przejazdy` (
   `timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `dodal` int(11) NOT NULL,
   `uwagi` text CHARACTER SET utf8 COLLATE utf8_bin
-) ENGINE=InnoDB AUTO_INCREMENT=49 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=64 DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -76,7 +90,7 @@ CREATE TABLE IF NOT EXISTS `przejazdy_backup` (
   `timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `dodal` int(11) NOT NULL,
   `uwagi` text CHARACTER SET utf8 COLLATE utf8_bin
-) ENGINE=InnoDB AUTO_INCREMENT=35 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=64 DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -94,6 +108,8 @@ CREATE TABLE IF NOT EXISTS `przejazdy_pelny` (
 ,`dystans` int(10) unsigned
 ,`data_przejazdu` datetime
 ,`uwagi` mediumtext
+,`dodal` varchar(30)
+,`dodano` timestamp
 );
 -- --------------------------------------------------------
 
@@ -118,9 +134,13 @@ CREATE TABLE IF NOT EXISTS `slownik_uczestnicy` (
 `id` int(10) unsigned NOT NULL,
   `imie` varchar(30) DEFAULT NULL,
   `nazwisko` varchar(30) DEFAULT NULL,
+  `login` varchar(20) DEFAULT NULL,
+  `haslo` varchar(50) DEFAULT NULL,
   `kierowca` tinyint(1) NOT NULL DEFAULT '1',
   `aktywny_do` datetime NOT NULL DEFAULT '2099-12-31 23:59:59',
-  `aktywny_od` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP
+  `aktywny_od` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `sesja` varchar(50) DEFAULT NULL,
+  `sesja_wazna` datetime DEFAULT NULL
 ) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
@@ -130,7 +150,7 @@ CREATE TABLE IF NOT EXISTS `slownik_uczestnicy` (
 --
 DROP TABLE IF EXISTS `przejazdy_pelny`;
 
-CREATE ALGORITHM=UNDEFINED DEFINER=`phpmyadmin`@`localhost` SQL SECURITY DEFINER VIEW `przejazdy_pelny` AS select `p`.`id` AS `id`,`su`.`imie` AS `pasazer`,`p`.`pasazer` AS `id_pasazer`,`su2`.`imie` AS `kierowca`,`p`.`kierowca` AS `id_kierowca`,`so`.`nazwa` AS `trasa`,`p`.`trasa_id` AS `id_trasa`,`p`.`dystans` AS `dystans`,`p`.`data_przejazdu` AS `data_przejazdu`,ifnull(`p`.`uwagi`,'') AS `uwagi` from (((`przejazdy` `p` join `slownik_uczestnicy` `su` on((`su`.`id` = `p`.`pasazer`))) join `slownik_uczestnicy` `su2` on((`p`.`kierowca` = `su2`.`id`))) join `slownik_odcinki` `so` on((`so`.`id` = `p`.`trasa_id`))) order by `p`.`id`;
+CREATE ALGORITHM=UNDEFINED DEFINER=`phpmyadmin`@`localhost` SQL SECURITY DEFINER VIEW `przejazdy_pelny` AS select `p`.`id` AS `id`,`su`.`imie` AS `pasazer`,`p`.`pasazer` AS `id_pasazer`,`su2`.`imie` AS `kierowca`,`p`.`kierowca` AS `id_kierowca`,`so`.`nazwa` AS `trasa`,`p`.`trasa_id` AS `id_trasa`,`p`.`dystans` AS `dystans`,`p`.`data_przejazdu` AS `data_przejazdu`,ifnull(`p`.`uwagi`,'') AS `uwagi`,`su3`.`imie` AS `dodal`,`p`.`timestamp` AS `dodano` from ((((`przejazdy` `p` join `slownik_uczestnicy` `su` on((`su`.`id` = `p`.`pasazer`))) join `slownik_uczestnicy` `su2` on((`p`.`kierowca` = `su2`.`id`))) join `slownik_odcinki` `so` on((`so`.`id` = `p`.`trasa_id`))) join `slownik_uczestnicy` `su3` on((`p`.`dodal` = `su3`.`id`))) order by `p`.`id`;
 
 --
 -- Indeksy dla zrzutów tabel
@@ -168,12 +188,12 @@ ALTER TABLE `slownik_uczestnicy`
 -- AUTO_INCREMENT dla tabeli `przejazdy`
 --
 ALTER TABLE `przejazdy`
-MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=49;
+MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=64;
 --
 -- AUTO_INCREMENT dla tabeli `przejazdy_backup`
 --
 ALTER TABLE `przejazdy_backup`
-MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=35;
+MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=64;
 --
 -- AUTO_INCREMENT dla tabeli `slownik_odcinki`
 --

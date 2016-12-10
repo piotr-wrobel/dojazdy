@@ -1,13 +1,15 @@
 <?php
 require_once('config.php');
+require_once('funkcje.php');
 openlog("DOJAZDY (".basename(__FILE__).")", LOG_PID, LOG_LOCAL0);
-if (isset($_POST['tablica']))
+if (isset($_POST['tablica']) AND zalogowany($database))
 {
 	$opcje=json_decode($_POST['tablica'],true);
 	switch($opcje['szablon'])
 	{
 		case '1':
 ?>
+			<status>ok</status>
 			<div class="obszar_belka">
 			<div class="pozycja_belka">
 			<span>Zdefiniuj przejazdy w dniu</span>
@@ -39,6 +41,9 @@ if (isset($_POST['tablica']))
 <?php		
 		break;
 		case '2':
+?>
+			<status>ok</status>
+<?php
 			if($opcje['parametr2']==0)
 			{
 ?>
@@ -54,7 +59,6 @@ if (isset($_POST['tablica']))
 			}
 			$mysqli->set_charset('utf8');
 			$zapytanie=	"SELECT id,imie,nazwisko,kierowca FROM slownik_uczestnicy WHERE aktywny_do > NOW() AND aktywny_od < NOW() ORDER BY imie,nazwisko";
-			 //error_log($zapytanie);
 			$result = $mysqli->query($zapytanie);
 
 			while ($row = $result->fetch_assoc())
@@ -74,7 +78,6 @@ if (isset($_POST['tablica']))
 			}
 			$mysqli->set_charset('utf8');
 			$zapytanie=	"SELECT id,nazwa,dlugosc FROM slownik_odcinki WHERE aktywny=1 ORDER BY nazwa";
-			 //error_log($zapytanie);
 			$result = $mysqli->query($zapytanie);
 
 			while ($row = $result->fetch_assoc())
@@ -141,6 +144,7 @@ if (isset($_POST['tablica']))
 		break;
 		case '11': //Szablon 1 dla rozliczenia
 ?>
+			<status>ok</status>
 			<div class="obszar_belka">
 			<div class="pozycja_belka">
 			<span>Pokaż rozliczenie po dniu: </span>
@@ -176,6 +180,7 @@ if (isset($_POST['tablica']))
 		break;
 		case '12': //Szablon 2 dla rozliczenia
 ?>
+			<status>ok</status>
 			<div id="tabelka">
 			<table class="tabelka">
 <?php
@@ -233,6 +238,7 @@ if (isset($_POST['tablica']))
 		break;
 		case '21':
 ?>
+			<status>ok</status>
 			<div class="obszar_belka">
 			<div class="pozycja_belka">
 			<span>Pokaż przejazdy w miesiącu: </span>
@@ -246,7 +252,6 @@ if (isset($_POST['tablica']))
 				}
 				$mysqli->set_charset('utf8');
 				$zapytanie=	"SELECT DATE_FORMAT(data_przejazdu, '%m/%Y') AS data FROM `przejazdy` GROUP BY DATA ORDER by data DESC";
-				 //error_log($zapytanie);
 				$result = $mysqli->query($zapytanie);
 
 				while ($row = $result->fetch_assoc())
@@ -266,6 +271,7 @@ if (isset($_POST['tablica']))
 		break;
 		case '22':
 ?>
+			<status>ok</status>
 			<div id="tabelka">
 			<table class="tabelka"><tr><th>Kierowca</th><th>Pasażer</th><th>Trasa</th><th>Dystans (km)</th><th>Data przejazdu</th></tr>
 <?php
@@ -278,9 +284,8 @@ if (isset($_POST['tablica']))
 				loguj_zakoncz("Błąd połączenia z MySQL: (" . $mysqli->connect_errno . ") " . $mysqli->connect_error);
 			}
 			$mysqli->set_charset('utf8');
-			$zapytanie=	"SELECT kierowca,pasazer,trasa,dystans,DATE_FORMAT(data_przejazdu, '%Y/%m/%d') AS data_przejazdu,DAY(data_przejazdu) AS dzien 
+			$zapytanie=	"SELECT kierowca,pasazer,trasa,dystans,DATE_FORMAT(data_przejazdu, '%Y/%m/%d') AS data_przejazdu,DAY(data_przejazdu) AS dzien,dodal,dodano 
 							FROM `przejazdy_pelny` WHERE data_przejazdu > '".$data_od."' AND data_przejazdu < '".$data_do."'  ORDER BY data_przejazdu,id";
-			//error_log($zapytanie);
 			$result = $mysqli->query($zapytanie);
 			$dzien=0;
 			while ($row = $result->fetch_assoc())
@@ -293,20 +298,20 @@ if (isset($_POST['tablica']))
 					$color_b=rand(150,255);
 				}
 ?>
-				<tr onclick="biezaceRozliczenie(2,'<?php echo $row['data_przejazdu'];?>','<?php echo $opcje['parametr'];?>')" title="Kliknij by zobaczyć rozliczenie po tym dniu..." class="wiersz_rozliczenia" style="background-color:rgb(<?php echo $color_r.','.$color_g.','.$color_b; ?>)">
-				<td class="wiersz_rozliczenia">
+				<tr onclick="biezaceRozliczenie(2,'<?php echo $row['data_przejazdu'];?>','<?php echo $opcje['parametr'];?>')" title="Dodane <?php echo $row['dodano'];?> przez <?php echo $row['dodal']."\n";?>Kliknij by zobaczyć rozliczenie po tym dniu..." class="wiersz_rozliczenia" style="background-color:rgb(<?php echo $color_r.','.$color_g.','.$color_b; ?>)">
+				<td class="wiersz_przejazdow">
 					<?php echo $row['kierowca'];?>
 				</td>
-				<td class="wiersz_rozliczenia">
+				<td class="wiersz_przejazdow">
 					<?php echo $row['pasazer'];?>
 				</td>
-				<td class="wiersz_rozliczenia">
+				<td class="wiersz_przejazdow">
 					<?php echo $row['trasa'];?>
 				</td>
-				<td class="wiersz_rozliczenia" style="text-align: right;">
+				<td class="wiersz_przejazdow" style="text-align: right;">
 					<?php echo $row['dystans'];?>
 				</td>
-				<td class="wiersz_rozliczenia">
+				<td class="wiersz_przejazdow">
 					<?php echo $row['data_przejazdu'].' '.dniTygodniaPL(date('l',strtotime($row['data_przejazdu'])));?>
 				</td>					
 				</tr>
@@ -320,36 +325,16 @@ if (isset($_POST['tablica']))
 <?php	
 		break;
 	}
+} else
+{
+?>
+			<status>wyloguj</status>
+			<div class="obszar_belka">
+			<div class="pozycja_belka">
+			Nie jesteś zalogowany !
+			</div>
+			</div>
+<?php	
 }
 closelog();
-
-function loguj_zakoncz($do_zalogowania)
-{
-	syslog(LOG_WARNING, $do_zalogowania);
-	closelog();
-	exit(0);
-}
-
-function clearStoredResults(){
-    global $mysqli;
-
-    do {
-         if ($res = $mysqli->store_result()) {
-           $res->free();
-         }
-        } while ($mysqli->more_results() && $mysqli->next_result());        
-
-}
-
-function dniTygodniaPL($wejscie)
-{
-	$wejscie=preg_replace('/Monday/','Poniedziałek',$wejscie);
-	$wejscie=preg_replace('/Tuesday/','Wtorek',$wejscie);
-	$wejscie=preg_replace('/Wednesday/','Środa',$wejscie);
-	$wejscie=preg_replace('/Thursday/','Czwartek',$wejscie);
-	$wejscie=preg_replace('/Friday/','Piątek',$wejscie);
-	$wejscie=preg_replace('/Saturday/','Sobota',$wejscie);
-	$wejscie=preg_replace('/Sunday/','Niedziela',$wejscie);
-	return $wejscie;
-}
 ?>
