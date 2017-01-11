@@ -293,7 +293,7 @@ function zaloguj(password)
 			SP=JSON.parse(wyjscie);
 			if (SP.zezwolenie)
 			{
-				setCookie('doJazdy_c1', SP.sesja, 7);
+				setCookie('doJazdy_c1', SP.sesja, 180);
 				location.reload(true);
 				
 			} else

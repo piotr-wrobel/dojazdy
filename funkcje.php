@@ -21,6 +21,13 @@ function zalogowany($database)
 	else
 		$wynik=false;
 	$result->close();
+	if($wynik!==false)
+	{
+		clearStoredResults($mysqli);
+		$zapytanie=	"UPDATE slownik_uczestnicy su SET su.sesja_wazna=ADDDATE(NOW(),'7') WHERE su.aktywny_do > NOW() AND su.aktywny_od < NOW() AND su.sesja='".$sesja."' AND su.sesja_wazna > NOW()";
+		$result = $mysqli->query($zapytanie);		
+	}
+	
 	$mysqli->close();
 	return $wynik;
 }

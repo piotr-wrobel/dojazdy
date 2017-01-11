@@ -251,7 +251,7 @@ if (isset($_POST['tablica']) AND zalogowany($database))
 					loguj_zakoncz("Błąd połączenia z MySQL: (" . $mysqli->connect_errno . ") " . $mysqli->connect_error);
 				}
 				$mysqli->set_charset('utf8');
-				$zapytanie=	"SELECT DATE_FORMAT(data_przejazdu, '%m/%Y') AS data FROM `przejazdy` GROUP BY DATA ORDER by data DESC";
+				$zapytanie=	"SELECT DATE_FORMAT(data_przejazdu, '%Y/%m') AS data FROM `przejazdy` GROUP BY DATA ORDER by data DESC";
 				$result = $mysqli->query($zapytanie);
 
 				while ($row = $result->fetch_assoc())
@@ -275,9 +275,8 @@ if (isset($_POST['tablica']) AND zalogowany($database))
 			<div id="tabelka">
 			<table class="tabelka"><tr><th>Kierowca</th><th>Pasażer</th><th>Trasa</th><th>Dystans (km)</th><th>Data przejazdu</th></tr>
 <?php
-			$rozbite=explode('/',$opcje['parametr']);
-			$data_od=date('Y-m-d H:i:s',strtotime($rozbite[1].'/'.$rozbite[0].'/01 00:00:00 -1second'));
-			$data_do=date('Y-m-d H:i:s',strtotime($rozbite[1].'/'.$rozbite[0].'/01 00:00:00 +1month'));
+			$data_od=date('Y-m-d H:i:s',strtotime($opcje['parametr'].'/01 00:00:00 -1second'));
+			$data_do=date('Y-m-d H:i:s',strtotime($opcje['parametr'].'/01 00:00:00 +1month'));
 			$mysqli = new mysqli($database['host'], $database['user'], $database['password'], $database['name']);
 			if ($mysqli->connect_errno) 
 			{
