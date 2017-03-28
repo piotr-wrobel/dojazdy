@@ -1,6 +1,6 @@
 <?php
 
-if(!defined('SYSTEM_VERSION')) define('SYSTEM_VERSION','1.1.1');
+if(!defined('SYSTEM_VERSION')) define('SYSTEM_VERSION','1.1.2');
 if(!defined('SYSTEM_NAME')) define('SYSTEM_NAME','doJazdy');
 
 //Configuracja bazy danych

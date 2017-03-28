@@ -134,6 +134,7 @@ body
 	padding: 0px;
 	width: 100%;
 	height: 85%;
+	overflow-y:auto;
 	font-family:Arial, Tahoma, Helvetica, sans-serif;
 	text-align: center;
 }
